@@ -18,7 +18,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Cloning repository...'
-                git branch: 'main',
+                git branch: 'master',
                     url: 'https://github.com/panchal-nikki/jenkins-learnings.git'
             }
         }
