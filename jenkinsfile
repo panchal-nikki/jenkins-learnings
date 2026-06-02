@@ -18,47 +18,47 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Cloning repository...'
-                git branch: 'master',
+                git branch: 'main',
                     url: 'https://github.com/panchal-nikki/jenkins-learnings.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'
+                sh 'npm install'         // ✅ changed from bat to sh
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'npm test -- --watchAll=false --passWithNoTests'
+                sh 'npm test -- --watchAll=false --passWithNoTests'   // ✅ sh
             }
         }
 
         stage('Build') {
             steps {
-                bat 'npm run build'
+                sh 'npm run build'       // ✅ sh
             }
         }
 
         stage('Docker Build') {
             steps {
-                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                bat "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."         // ✅ sh
+                sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
             }
         }
 
         stage('Deploy') {
             steps {
-                bat """
-                    docker stop ${CONTAINER_NAME} 2>nul || echo No old container
-                    docker rm   ${CONTAINER_NAME} 2>nul || echo No old container
-                    docker run -d ^
-                        --name ${CONTAINER_NAME} ^
-                        -p ${PORT}:80 ^
-                        --restart unless-stopped ^
+                sh """
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm   ${CONTAINER_NAME} || true
+                    docker run -d \\
+                        --name ${CONTAINER_NAME} \\
+                        -p ${PORT}:80 \\
+                        --restart unless-stopped \\
                         ${IMAGE_NAME}:latest
-                """
+                """                      // ✅ sh with Linux syntax
             }
         }
     }
