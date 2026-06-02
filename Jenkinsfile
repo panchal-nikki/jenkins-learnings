@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node18'
-    }
-
     environment {
         IMAGE_NAME     = 'react-app'
         IMAGE_TAG      = "${BUILD_NUMBER}"
@@ -20,6 +16,12 @@ pipeline {
                 echo 'Cloning repository...'
                 git branch: 'master',
                     url: 'https://github.com/panchal-nikki/jenkins-learnings.git'
+            }
+        }
+
+        stage('Verify Node') {
+            steps {
+                sh 'node --version && npm --version'
             }
         }
 
