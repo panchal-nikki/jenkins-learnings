@@ -2,16 +2,18 @@ version: '3.8'
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins       # ← Use custom image
     container_name: jenkins
     restart: unless-stopped
     privileged: true
     user: root
     ports:
-      - "8080:8080"       # Jenkins Web UI
-      - "50000:50000"     # Jenkins Agent port
+      - "8080:8080"
+      - "50000:50000"
     volumes:
       - C:/jenkins-docker/jenkins_home:/var/jenkins_home
-      - //var/run/docker.sock:/var/run/docker.sock   # Docker-in-Docker
+      - //var/run/docker.sock:/var/run/docker.sock
     environment:
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=true
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
