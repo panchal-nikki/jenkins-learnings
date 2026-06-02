@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'Node18'
+    }
+
+    environment {
+        IMAGE_NAME     = 'react-app'
+        IMAGE_TAG      = "${BUILD_NUMBER}"
+        CONTAINER_NAME = 'react-app-container'
+        PORT           = '3000'
+        CI             = 'true'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                git branch: 'main',
+                    url: 'https://github.com/your-username/your-react-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'npm test -- --watchAll=false --passWithNoTests'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                bat "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                bat """
+                    docker stop ${CONTAINER_NAME} 2>nul || echo No old container
+                    docker rm   ${CONTAINER_NAME} 2>nul || echo No old container
+                    docker run -d ^
+                        --name ${CONTAINER_NAME} ^
+                        -p ${PORT}:80 ^
+                        --restart unless-stopped ^
+                        ${IMAGE_NAME}:latest
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ App is live at http://localhost:${PORT}"
+        }
+        failure {
+            echo '❌ Pipeline failed. Check Console Output.'
+        }
+    }
+}
