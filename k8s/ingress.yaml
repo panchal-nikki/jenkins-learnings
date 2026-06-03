@@ -1,0 +1,37 @@
+# -------------------------------------------------------
+# INGRESS
+# An Ingress exposes HTTP/HTTPS routes from outside the
+# cluster to Services inside the cluster.
+# It acts as a smart reverse-proxy / load balancer.
+#
+# Requires an Ingress Controller to be installed first:
+#   Minikube : minikube addons enable ingress
+#   Others   : install nginx-ingress-controller via Helm
+# -------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: react-app-ingress
+  namespace: react-app
+  annotations:
+    # Tell Kubernetes which ingress controller to use
+    kubernetes.io/ingress.class: "nginx"
+    # Redirect all HTTP traffic to HTTPS (uncomment in production)
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Rewrite target (useful when app is served under a sub-path)
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    # ---- Host-based routing ----
+    # Add this to your /etc/hosts for local testing:
+    #   127.0.0.1  react-app.local
+    - host: react-app.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: react-app-service
+                port:
+                  number: 80

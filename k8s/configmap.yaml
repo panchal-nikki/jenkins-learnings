@@ -1,0 +1,17 @@
+# -------------------------------------------------------
+# CONFIGMAP
+# Stores non-sensitive configuration as key-value pairs.
+# Injected into Pods as environment variables or files.
+# -------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-app-config
+  namespace: react-app
+  labels:
+    app: react-app
+data:
+  # Example: you can reference these as env vars in the Deployment
+  APP_ENV: "production"
+  APP_NAME: "basic-react-app"
+  NGINX_PORT: "80"

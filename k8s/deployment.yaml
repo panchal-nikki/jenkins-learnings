@@ -1,0 +1,86 @@
+# -------------------------------------------------------
+# DEPLOYMENT
+# A Deployment manages a ReplicaSet, which ensures the
+# desired number of identical Pod copies are always running.
+#
+# Key concepts demonstrated here:
+#   - replicas         : how many Pod instances to run
+#   - selector         : links the Deployment to its Pods
+#   - strategy         : RollingUpdate = zero-downtime deploys
+#   - resources        : CPU/memory requests & limits
+#   - probes           : liveness & readiness health checks
+#   - envFrom          : injecting ConfigMap data as env vars
+# -------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app
+  namespace: react-app
+  labels:
+    app: react-app
+spec:
+  # ---- Scaling ----
+  replicas: 2   # Run 2 pods for high availability
+
+  # ---- Zero-downtime rolling update strategy ----
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1         # One extra pod allowed during update
+      maxUnavailable: 0   # No pod goes down during update
+
+  # ---- Pod selector (must match template labels) ----
+  selector:
+    matchLabels:
+      app: react-app
+
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      containers:
+        - name: react-app
+          # Replace with your real Docker Hub image, e.g.:
+          # image: your-dockerhub-username/react-app:latest
+          image: react-app:latest
+          imagePullPolicy: IfNotPresent   # Use local image (good for Minikube)
+
+          ports:
+            - containerPort: 80   # nginx inside the container listens on 80
+
+          # ---- Inject ConfigMap as environment variables ----
+          envFrom:
+            - configMapRef:
+                name: react-app-config
+
+          # ---- Resource requests & limits ----
+          # requests: minimum guaranteed resources
+          # limits:   maximum allowed resources
+          resources:
+            requests:
+              cpu: "100m"      # 0.1 CPU core
+              memory: "128Mi"
+            limits:
+              cpu: "250m"      # 0.25 CPU core
+              memory: "256Mi"
+
+          # ---- Liveness Probe ----
+          # Kubernetes restarts the container if this fails.
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+
+          # ---- Readiness Probe ----
+          # Traffic is only sent to a pod when this passes.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3

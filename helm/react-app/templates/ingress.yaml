@@ -1,0 +1,28 @@
+{{/*
+  Ingress template
+  Only created when ingress.enabled = true in values.yaml.
+  This is a common Helm pattern for optional resources.
+*/}}
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "react-app.fullname" . }}-ingress
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "react-app.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.className | quote }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "react-app.fullname" . }}-service
+                port:
+                  number: {{ .Values.service.port }}
+{{- end }}

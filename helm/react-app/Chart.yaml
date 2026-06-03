@@ -1,0 +1,32 @@
+# -------------------------------------------------------
+# Chart.yaml — Helm Chart Metadata
+#
+# Every Helm chart starts with this file.
+# It describes what the chart is and its version.
+# -------------------------------------------------------
+apiVersion: v2           # Helm 3 uses apiVersion: v2
+name: react-app          # Chart name (used in release names)
+description: >
+  A Helm chart for deploying the basic React app on Kubernetes.
+  Created for Jenkins + Kubernetes + Helm learning purposes.
+
+# Chart types:
+#   application : a deployable application (default)
+#   library     : reusable chart templates (no resources deployed)
+type: application
+
+# Chart version — bump this whenever you change the chart itself
+version: 0.1.0
+
+# App version — the version of the application being deployed
+appVersion: "1.0.0"
+
+keywords:
+  - react
+  - nginx
+  - frontend
+  - learning
+
+maintainers:
+  - name: Learning Team
+    email: learn@example.com

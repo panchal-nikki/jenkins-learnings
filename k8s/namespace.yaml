@@ -1,0 +1,12 @@
+# -------------------------------------------------------
+# NAMESPACE
+# A Namespace is a logical partition inside your cluster.
+# It lets you group related resources and set quotas.
+# -------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: react-app
+  labels:
+    app: react-app
+    environment: learning

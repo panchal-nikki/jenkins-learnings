@@ -1,0 +1,32 @@
+# -------------------------------------------------------
+# SERVICE
+# A Service gives Pods a stable network endpoint.
+# Pod IPs change when pods restart; a Service IP is stable.
+#
+# Types:
+#   ClusterIP    : internal only (default)
+#   NodePort     : exposes on every node's IP + a port (good for local learning)
+#   LoadBalancer : provisions a cloud LB (AWS/GCP/Azure)
+# -------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-app-service
+  namespace: react-app
+  labels:
+    app: react-app
+spec:
+  # ---- NodePort makes the app reachable from your laptop ----
+  # Access via: http://<node-ip>:30080
+  # For Minikube: minikube service react-app-service -n react-app
+  type: NodePort
+
+  selector:
+    app: react-app   # Routes traffic to pods with this label
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80          # The port the Service listens on (inside cluster)
+      targetPort: 80    # The port the container exposes
+      nodePort: 30080   # The port exposed on every Node (30000-32767 range)

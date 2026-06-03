@@ -1,0 +1,69 @@
+# -------------------------------------------------------
+# values.yaml — Default Configuration Values
+#
+# These are the defaults for every template in this chart.
+# Users can override them with:
+#   helm install my-app ./react-app --set replicaCount=3
+#   helm install my-app ./react-app -f custom-values.yaml
+# -------------------------------------------------------
+
+# ---- Replica count ----
+replicaCount: 2
+
+# ---- Container image ----
+image:
+  # Replace with your Docker Hub username before pushing
+  repository: react-app
+  tag: "latest"
+  # IfNotPresent is best for local Minikube learning
+  pullPolicy: IfNotPresent
+
+# ---- Kubernetes Service ----
+service:
+  # Options: ClusterIP | NodePort | LoadBalancer
+  type: NodePort
+  port: 80
+  nodePort: 30080     # Only used when type = NodePort
+
+# ---- Ingress ----
+ingress:
+  enabled: true
+  className: "nginx"
+  host: react-app.local   # Add to /etc/hosts → 127.0.0.1 react-app.local
+  # tls: []               # Uncomment to add TLS/HTTPS
+
+# ---- Resource requests & limits ----
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+# ---- Horizontal Pod Autoscaler ----
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+
+# ---- Application configuration (injected as ConfigMap) ----
+config:
+  APP_ENV: "production"
+  APP_NAME: "basic-react-app"
+
+# ---- Health probes ----
+livenessProbe:
+  path: /
+  initialDelaySeconds: 10
+  periodSeconds: 15
+
+readinessProbe:
+  path: /
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# ---- Namespace ----
+namespace: react-app
